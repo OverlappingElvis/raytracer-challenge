@@ -305,6 +305,7 @@ version = "0.1.0"
 dependencies = [
  "array2d",
  "image",
+ "utility",
 ]
 
 [[package]]
@@ -329,6 +330,10 @@ dependencies = [
  "miniz_oxide 0.4.4",
  "weezl",
 ]
+
+[[package]]
+name = "utility"
+version = "0.1.0"
 
 [[package]]
 name = "weezl"
