@@ -1,5 +1,6 @@
 mod tuple;
 mod color;
+mod canvas;
 
 struct Environment {
   gravity: tuple::Vector,

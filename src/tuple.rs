@@ -1,5 +1,5 @@
-extern crate utility;
 use std;
+use utility::equal;
 
 #[derive(Debug,Copy,Clone)]
 pub struct Tuple {
@@ -14,10 +14,10 @@ pub type Point = Tuple;
 
 impl std::cmp::PartialEq for Tuple {
   fn eq (&self, rhs: &Self) -> bool {
-    utility::equal(self.x, rhs.x)
-      && utility::equal(self.y, rhs.y)
-      && utility::equal(self.z, rhs.z)
-      && utility::equal(self.w, rhs.w)
+    equal(self.x, rhs.x)
+      && equal(self.y, rhs.y)
+      && equal(self.z, rhs.z)
+      && equal(self.w, rhs.w)
   }
 }
 
@@ -291,7 +291,7 @@ mod tests {
     let v3 = ops::normalize(helpers::vector(1.0, 2.0, 3.0));
     let v4 = helpers::vector(1.0 / (14.0f32).sqrt(), 2.0 / (14.0f32).sqrt(), 3.0 / (14.0f32).sqrt());
     assert_eq!(v3, v4);
-    assert!(utility::equal(ops::magnitude(v3), 1.0));
+    assert!(equal(ops::magnitude(v3), 1.0));
   }
 
   #[test]

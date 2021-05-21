@@ -1,5 +1,5 @@
-extern crate utility;
 use std;
+use utility::equal;
 
 #[derive(Debug,Copy,Clone)]
 pub struct Color {
@@ -10,9 +10,9 @@ pub struct Color {
 
 impl std::cmp::PartialEq for Color {
   fn eq (&self, rhs: &Self) -> bool {
-    utility::equal(self.red, rhs.red)
-      && utility::equal(self.green, rhs.green)
-      && utility::equal(self.blue, rhs.blue)
+    equal(self.red, rhs.red)
+      && equal(self.green, rhs.green)
+      && equal(self.blue, rhs.blue)
   }
 }
 
