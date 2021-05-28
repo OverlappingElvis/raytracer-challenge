@@ -3,9 +3,9 @@ use utility::equal;
 
 #[derive(Debug,Copy,Clone)]
 pub struct Color {
-  red: f32,
-  green: f32,
-  blue: f32
+  pub red: f32,
+  pub green: f32,
+  pub blue: f32
 }
 
 impl std::cmp::PartialEq for Color {
@@ -76,7 +76,7 @@ pub mod helpers {
 
 pub mod ops {
 
-  fn normalize_color_value (value: f32) -> f32 {
+  pub fn normalize_color_value (value: f32) -> f32 {
     let normalized_value = value * 255.0;
 
     if normalized_value > 255.0 {
@@ -137,6 +137,11 @@ mod tests {
     let c2 = helpers::color(0.9, 1.0, 0.1);
     let c3 = c1 * c2;
     assert_eq!(c3, helpers::color(0.9, 0.2, 0.04));
+  }
+
+  #[test]
+  fn test_normalize_color_value () {
+    assert_eq!(ops::normalize_color_value(256.00), 255.0);
   }
 }
 
