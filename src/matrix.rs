@@ -1,4 +1,5 @@
 use array2d::Array2D;
+use crate::tuple;
 use crate::tuple::Tuple;
 use std;
 
@@ -19,19 +20,33 @@ impl std::ops::Mul<Matrix> for Matrix {
   fn mul (self, rhs: Matrix) -> Matrix {
     let mut result = Array2D::filled_with(0.0, self.values.num_rows(), self.values.num_columns());
 
-    let rows = self.values.num_rows();
-    let columns = self.values.num_columns();
-
-    for row in 0..rows {
-      for column in 0..columns {
-
-        result[(row, column)] = (0..rows).map(|x| -> f32 { self[(row, x)] * rhs[(x, column)] }).sum();
+    for row in 0..4 {
+      for column in 0..4 {
+        result[(row, column)] = (0..4).map(|i| -> f32 {
+          self[(row, i)] * rhs[(i, column)]
+        }).sum();
       }
     }
 
     return Matrix {
       values: result
     };
+  }
+}
+
+impl std::ops::Mul<Tuple> for Matrix {
+  type Output = Tuple;
+
+  fn mul (self, rhs: Tuple) -> Tuple {
+    let mut result = tuple::helpers::tuple(0.0, 0.0, 0.0, 0.0);
+
+    for row_index in 0..4 {
+      result[row_index] = (0..4).map(|i| -> f32 {
+        self[(row_index, i)] * rhs[i]
+      }).sum();
+    }
+
+    return result;
   }
 }
 
@@ -51,10 +66,27 @@ pub mod helpers {
       values: Array2D::from_rows(&rows)
     }
   }
+
+  pub fn identity () -> Matrix {
+    Matrix {
+      values: Array2D::from_rows(&vec![
+        vec![1.0, 0.0, 0.0, 0.0],
+        vec![0.0, 1.0, 0.0, 0.0],
+        vec![0.0, 0.0, 1.0, 0.0],
+        vec![0.0, 0.0, 0.0, 1.0]
+      ])
+    }
+  }
 }
 
 pub mod ops {
+  use super::*;
 
+  pub fn transpose (matrix: Matrix) -> Matrix {
+    Matrix {
+      values: Array2D::from_columns(&matrix.values.as_rows())
+    }
+  }
 }
 
 #[cfg(test)]
@@ -109,7 +141,7 @@ mod tests {
       vec![9.0, 8.0, 7.0, 6.0],
       vec![5.0, 4.0, 3.0, 2.0]
     ]);
-  let m2 = helpers::matrix(vec![
+    let m2 = helpers::matrix(vec![
       vec![-2.0, 1.0, 2.0, 3.0],
       vec![3.0, 2.0, 1.0, -1.0],
       vec![4.0, 3.0, 6.0, 5.0],
@@ -122,5 +154,67 @@ mod tests {
       vec![16.0, 26.0, 46.0, 42.0]
     ]);
     assert_eq!(m1 * m2, m3);
+  }
+
+  #[test]
+  fn test_matrix_identity () {
+    let m1 = helpers::matrix(vec![
+      vec![1.0, 2.0, 3.0, 4.0],
+      vec![5.0, 6.0, 7.0, 8.0],
+      vec![9.0, 8.0, 7.0, 6.0],
+      vec![5.0, 4.0, 3.0, 2.0]
+    ]);
+    let m2 = helpers::identity();
+    let m3 = m1 * m2;
+
+    assert_eq!(m3, helpers::matrix(vec![
+      vec![1.0, 2.0, 3.0, 4.0],
+      vec![5.0, 6.0, 7.0, 8.0],
+      vec![9.0, 8.0, 7.0, 6.0],
+      vec![5.0, 4.0, 3.0, 2.0]
+    ]));
+  }
+
+  #[test]
+  fn test_matrix_tuple_multiplication () {
+    let m1 = helpers::matrix(vec![
+      vec![1.0, 2.0, 3.0, 4.0],
+      vec![2.0, 4.0, 4.0, 2.0],
+      vec![8.0, 6.0, 4.0, 1.0],
+      vec![0.0, 0.0, 0.0, 1.0]
+    ]);
+    let t1 = tuple::helpers::tuple(1.0, 2.0, 3.0, 1.0);
+    let t2 = m1 * t1;
+    assert_eq!(t2, tuple::helpers::tuple(18.0, 24.0, 33.0, 1.0));
+  }
+
+  #[test]
+  fn test_tuple_identity () {
+    let m1 = helpers::identity();
+    let t1 = tuple::helpers::tuple(1.0, 2.0, 3.0, 1.0);
+    let t2 = t1.clone();
+    let t3 = m1 * t1;
+    assert_eq!(t2, t3);
+  }
+
+  #[test]
+  fn test_transpose_matrix () {
+    let m1 = helpers::matrix(vec![
+      vec![0.0, 9.0, 3.0, 0.0],
+      vec![9.0, 8.0, 0.0, 8.0],
+      vec![1.0, 8.0, 5.0, 3.0],
+      vec![0.0, 0.0, 5.0, 8.0]
+    ]);
+
+    let m2 = ops::transpose(m1);
+
+    let m3 = helpers::matrix(vec![
+      vec![0.0, 9.0, 1.0, 0.0],
+      vec![9.0, 8.0, 8.0, 0.0],
+      vec![3.0, 0.0, 5.0, 5.0],
+      vec![0.0, 8.0, 3.0, 8.0]
+    ]);
+
+    assert_eq!(m2, m3);
   }
 }

@@ -12,6 +12,32 @@ pub struct Tuple {
 pub type Vector = Tuple;
 pub type Point = Tuple;
 
+impl std::ops::Index<usize> for Tuple {
+  type Output = f32;
+
+  fn index (&self, index: usize) -> &Self::Output {
+    match index {
+      0 => &self.x,
+      1 => &self.y,
+      2 => &self.z,
+      3 => &self.w,
+      _ => panic!("Out of range")
+    }
+  }
+}
+
+impl std::ops::IndexMut<usize> for Tuple {
+  fn index_mut(&mut self, index: usize) -> &mut f32 {
+    match index {
+      0 => &mut self.x,
+      1 => &mut self.y,
+      2 => &mut self.z,
+      3 => &mut self.w,
+      _ => panic!("Out of range")
+    }
+  }
+}
+
 impl std::cmp::PartialEq for Tuple {
   fn eq (&self, rhs: &Self) -> bool {
     equal(self.x, rhs.x)
