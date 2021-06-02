@@ -87,6 +87,36 @@ pub mod ops {
       values: Array2D::from_columns(&matrix.values.as_rows())
     }
   }
+
+  pub fn determinant (array: Array2D<f32>) -> f32 {
+    if array.num_rows() != 2 && array.num_columns() != 2 {
+      panic!("Can only find determinant for 2x2 matrix");
+    }
+
+    return array[(0, 0)] * array[(1, 1)] - array[(0, 1)] * array[(1, 0)];
+  }
+
+  // TODO: rewrite using array subviews or slices
+  pub fn submatrix (array: Array2D<f32>, remove_row: usize, remove_column: usize) -> Array2D<f32> {
+    let array_rows = array.num_rows();
+    let array_columns = array.num_columns();
+    let mut result = Array2D::filled_with(0.0, array_rows - 1, array_columns - 1);
+
+    for row in 0..array_rows {
+      if row != remove_row {
+        for column in 0..array_columns {
+          if column != remove_column {
+            let row_index = if row < remove_row { row } else { row - 1 };
+            let column_index = if column < remove_column { column } else { column - 1};
+
+            result[(row_index, column_index)] = array[(row, column)];
+          }
+        }
+      }
+    }
+
+    return result;
+  }
 }
 
 #[cfg(test)]
@@ -216,5 +246,46 @@ mod tests {
     ]);
 
     assert_eq!(m2, m3);
+  }
+
+  #[test]
+  fn test_determinant () {
+    let m1 = Array2D::from_rows(&vec![
+      vec![1.0, 5.0],
+      vec![-3.0, 2.0]
+    ]);
+
+    assert_eq!(ops::determinant(m1), 17.0);
+  }
+
+  #[test]
+  fn test_submatrix () {
+    let m1 = Array2D::from_rows(&vec![
+      vec![1.0, 5.0, 0.0],
+      vec![-3.0, 2.0, 7.0],
+      vec![0.0, 6.0, -3.0]
+    ]);
+
+    let m2 = Array2D::from_rows(&vec![
+      vec![-3.0, 2.0],
+      vec![0.0, 6.0]
+    ]);
+
+    assert_eq!(ops::submatrix(m1, 0, 2), m2);
+
+    let m3 = Array2D::from_rows(&vec![
+      vec![-6.0, 1.0, 1.0, 6.0],
+      vec![-8.0, 5.0, 8.0, 6.0],
+      vec![-1.0, 0.0, 8.0, 2.0],
+      vec![-7.0, 1.0, -1.0, 1.0]
+    ]);
+
+    let m4 = Array2D::from_rows(&vec![
+      vec![-6.0, 1.0, 6.0],
+      vec![-8.0, 8.0, 6.0],
+      vec![-7.0, -1.0, 1.0]
+    ]);
+
+    assert_eq!(ops::submatrix(m3, 2, 1), m4);
   }
 }
